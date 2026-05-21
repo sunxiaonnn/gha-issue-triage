@@ -18,7 +18,7 @@ def test_valid_labels_set():
     """VALID_LABELS contains expected labels."""
     assert "bug" in VALID_LABELS
     assert "duplicate" in VALID_LABELS
-    assert "good-first-issue" in VALID_LABELS
+    assert "good first issue" in VALID_LABELS
 
 
 @patch("src.labels.subprocess.run")
@@ -46,7 +46,7 @@ def test_apply_labels_adds_to_empty_issue(mock_ensure, mock_run):
 def test_apply_labels_removes_fossil(mock_ensure, mock_run):
     """Re-triage with reduced desired set removes the dropped label."""
     # Arrange: issue has bug + enhancement, desired is only bug
-    mock_run.side_effect = [_mk_run(stdout="bug\nenhancement\n"), _mk_run(returncode=0)]
+    mock_run.side_effect = [_mk_run(stdout="bug\\nenhancement\\n"), _mk_run(returncode=0)]
 
     # Act
     result = apply_labels(42, ["bug"])
@@ -66,7 +66,7 @@ def test_apply_labels_removes_fossil(mock_ensure, mock_run):
 def test_apply_labels_noop_when_in_sync(mock_ensure, mock_run):
     """When desired matches managed_current, no gh edit call is made."""
     # Arrange
-    mock_run.side_effect = [_mk_run(stdout="bug\n")]
+    mock_run.side_effect = [_mk_run(stdout="bug\\n")]
 
     # Act
     result = apply_labels(42, ["bug"])
@@ -82,7 +82,7 @@ def test_apply_labels_noop_when_in_sync(mock_ensure, mock_run):
 def test_apply_labels_preserves_human_labels(mock_ensure, mock_run):
     """Labels outside VALID_LABELS are never touched by reconciliation."""
     # Arrange: human added 'help-wanted' (not in VALID_LABELS); desired matches managed
-    mock_run.side_effect = [_mk_run(stdout="bug\nhelp-wanted\n")]
+    mock_run.side_effect = [_mk_run(stdout="bug\\nhelp-wanted\\n")]
 
     # Act
     result = apply_labels(42, ["bug"])
@@ -97,7 +97,7 @@ def test_apply_labels_preserves_human_labels(mock_ensure, mock_run):
 def test_apply_labels_add_and_remove_in_one_call(mock_ensure, mock_run):
     """A single gh edit invocation carries both --add-label and --remove-label."""
     # Arrange: had enhancement, now want bug
-    mock_run.side_effect = [_mk_run(stdout="enhancement\n"), _mk_run(returncode=0)]
+    mock_run.side_effect = [_mk_run(stdout="enhancement\\n"), _mk_run(returncode=0)]
 
     # Act
     result = apply_labels(42, ["bug"])
@@ -162,7 +162,7 @@ def test_apply_labels_gh_edit_failure(mock_ensure, mock_run):
 def test_get_current_labels_returns_set(mock_run):
     """Parses gh issue view output into a set."""
     # Arrange
-    mock_run.return_value = _mk_run(stdout="bug\nduplicate\n")
+    mock_run.return_value = _mk_run(stdout="bug\\nduplicate\\n")
 
     # Act
     result = _get_current_labels(42)
